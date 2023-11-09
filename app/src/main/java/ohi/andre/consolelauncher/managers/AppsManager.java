@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -18,8 +19,11 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Process;
+import android.os.UserHandle;
+import android.os.UserManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -382,17 +386,44 @@ public class AppsManager implements XMLPrefsElement {
     }
 
     private List<LaunchInfo> createAppMap(PackageManager mgr) {
+        Log.d("juan_createappmap", "in create appmap");
         List<LaunchInfo> infos = new ArrayList<>();
 
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-//            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-//
-//            List<PackageInfo> installedPackages = mgr.getInstalledPackages(0);
-//            List<LauncherActivityInfo> activityInfos = new ArrayList<>();
-//            for(PackageInfo info : installedPackages) {
-//                activityInfos.addAll(launcherApps.getActivityList(info.packageName, android.os.Process.myUserHandle()));
-//            }
-//        } else {
+        //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            Log.d("juan_createappmap", "version more than N_MR1");
+            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+            LaunchInfo li;
+            LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
+            query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
+
+            for (UserHandle profile : userManager.getUserProfiles()) {
+                Log.d("juan_createappmap", "profile: " + profile.toString());
+                for (LauncherActivityInfo app : launcherApps.getActivityList(null, profile)) {
+                    //Log.d("juan_createappmap", "packageName: " + app.getApplicationInfo().packageName + " appName: " + app.getName() + " label: " + app.getLabel().toString());
+                    if (!profile.toString().equals("UserHandle{0}")) {
+                        li = new LaunchInfo(app.getComponentName(), app.getLabel().toString() + " WORK");
+                    } else{
+                        li = new LaunchInfo(app.getComponentName(), app.getLabel().toString());
+                    }
+                    query.setPackage(li.componentName.getPackageName());
+                    li.setShortcuts(launcherApps.getShortcuts(query, profile));
+                    /*try {
+                        LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
+                        query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
+                        query.setPackage(li.componentName.getPackageName());
+
+                    } catch (Throwable e) {
+                        //Log.d("juan_createappmap", "t-ui is not the default launcher");
+//                      t-ui is not the default launcher
+                        Tuils.log(e);
+                    }*/
+                    Log.d("juan_createappmap", "shortcuts: " + li.shortcuts);
+                    infos.add(li);
+                }
+            }
+        } else {
             Intent i = new Intent(Intent.ACTION_MAIN);
             i.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -402,32 +433,33 @@ public class AppsManager implements XMLPrefsElement {
             } catch (Exception e) {
                 return infos;
             }
-//        }
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && Tuils.isMyLauncherDefault(context.getPackageManager())) {
+                Log.d("juan_createappmap", "getting LauncherApps");
+                LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                for (ResolveInfo ri : main) {
+                    LaunchInfo li = new LaunchInfo(ri.activityInfo.packageName, ri.activityInfo.name, ri.loadLabel(mgr).toString());
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && Tuils.isMyLauncherDefault(context.getPackageManager())) {
-            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-            for (ResolveInfo ri : main) {
-                LaunchInfo li = new LaunchInfo(ri.activityInfo.packageName, ri.activityInfo.name, ri.loadLabel(mgr).toString());
-
-                try {
-                    LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
-                    query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
-                    query.setPackage(li.componentName.getPackageName());
-                    li.setShortcuts(launcherApps.getShortcuts(query, Process.myUserHandle()));
-                } catch (Throwable e) {
+                    try {
+                        LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
+                        query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
+                        query.setPackage(li.componentName.getPackageName());
+                        li.setShortcuts(launcherApps.getShortcuts(query, Process.myUserHandle()));
+                    } catch (Throwable e) {
 //                    t-ui is not the default launcher
-                    Tuils.log(e);
-                }
+                        Tuils.log(e);
+                    }
 
-                infos.add(li);
-            }
-        } else {
-            for (ResolveInfo ri : main) {
-                LaunchInfo li = new LaunchInfo(ri.activityInfo.packageName, ri.activityInfo.name, ri.loadLabel(mgr).toString());
-                infos.add(li);
+                    infos.add(li);
+                }
+            } else {
+                Log.d("juan_createappmap", "Else");
+                for (ResolveInfo ri : main) {
+                    LaunchInfo li = new LaunchInfo(ri.activityInfo.packageName, ri.activityInfo.name, ri.loadLabel(mgr).toString());
+                    infos.add(li);
+                }
             }
         }
-
+        Log.d("juan_createappmap", "infos: " + infos);
         return infos;
     }
 
@@ -1074,6 +1106,11 @@ public class AppsManager implements XMLPrefsElement {
             setLabel(label);
         }
 
+        public LaunchInfo(ComponentName componentName, String label) {
+            this.componentName = componentName;
+            setLabel(label);
+        }
+
         protected LaunchInfo(Parcel in) {
             componentName = in.readParcelable(ComponentName.class.getClassLoader());
             setLabel(in.readString());
@@ -1109,7 +1146,8 @@ public class AppsManager implements XMLPrefsElement {
 
         public boolean is(String app) {
             String[] split2 = app.split(COMPONENT_SEPARATOR);
-
+            Log.d("juan_launchinfo", "app: " + app);
+            Log.d("juan_launchinfo", "split2: " + split2);
             if(split2.length == 1) {
                 if(componentName.getPackageName().equals(split2[0])) return true;
             } else {

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.LauncherApps;
 import android.content.pm.ShortcutInfo;
 import android.os.Build;
+import android.util.Log;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class shortcut extends ParamCommand implements APICommand {
             public String exec(ExecutePack pack) {
                 String id = pack.getString();
                 AppsManager.LaunchInfo li = pack.getLaunchInfo();
+
 
                 ShortcutInfo shortcut = null;
                 int index;

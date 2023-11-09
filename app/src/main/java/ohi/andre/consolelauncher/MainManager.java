@@ -1,15 +1,21 @@
 package ohi.andre.consolelauncher;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.LauncherActivityInfo;
+import android.content.pm.LauncherApps;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Parcelable;
+import android.os.UserHandle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 
 import java.io.File;
 import java.util.List;
@@ -272,7 +278,7 @@ public class MainManager {
         }
     }
 
-    public void onCommand(String input, AppsManager.LaunchInfo launchInfo, boolean wasMusicService) {
+    public void onCommand(String input, AppsManager.LaunchInfo launchInfo, UserHandle userHandle, boolean wasMusicService) {
         if(launchInfo == null) {
             onCommand(input, (String) null, wasMusicService);
             return;
@@ -281,7 +287,12 @@ public class MainManager {
         updateServices(input, wasMusicService);
 
         if(launchInfo.unspacedLowercaseLabel.equals(Tuils.removeSpaces(input.toLowerCase()))) {
-            performLaunch(mainPack, launchInfo, input);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                launchApp(launchInfo.componentName, );
+            } else {
+                performLaunch(mainPack, launchInfo, input);
+            }
+
         } else {
             onCommand(input, (String) null, wasMusicService);
         }
@@ -438,6 +449,26 @@ public class MainManager {
         return true;
     }
 //
+
+    public void launchApp(ComponentName component, UserHandle userHandle) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+            List<LauncherActivityInfo> activityInfo = launcher.getActivityList(component.getPackageName(), userHandle);
+            try {
+                launcher.startMainActivity(component, userHandle, null, null);
+            } catch (SecurityException se) {
+                try {
+                    launcher.startMainActivity(component, android.os.Process.myUserHandle(), null, null);
+                } catch (Exception e1) {
+                    Log.d("juan", "unable to open app");
+                    //mContext.showToast(mContext.getString(R.string.unable_to_open_app));
+                }
+            } catch (Exception e2) {
+                Log.d("juan", "unable to open app");
+                //mContext.showToast(mContext.getString(R.string.tuinotfound_app));
+            }
+        }
+    }
 
     public interface CmdTrigger {
         boolean trigger(MainPack info, String input) throws Exception;
