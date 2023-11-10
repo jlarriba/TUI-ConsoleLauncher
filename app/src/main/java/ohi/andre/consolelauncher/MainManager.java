@@ -247,8 +247,8 @@ public class MainManager {
                         i.putExtra(PrivateIOReceiver.TEXT, cmd);
                         LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(i);
                     }
-
                     if(p != null && p instanceof AppsManager.LaunchInfo) {
+
                         onCommand(cmd, (AppsManager.LaunchInfo) p, intent.getBooleanExtra(MainManager.MUSIC_SERVICE, false));
                     } else {
                         onCommand(cmd, aliasName, intent.getBooleanExtra(MainManager.MUSIC_SERVICE, false));
@@ -287,8 +287,6 @@ public class MainManager {
         updateServices(input, wasMusicService);
 
         if(launchInfo.unspacedLowercaseLabel.equals(Tuils.removeSpaces(input.toLowerCase()))) {
-            Log.d("juan_oncommand", "performLaunch");
-            //performLaunch(mainPack, launchInfo, input);
             performLaunch(launchInfo);
         } else {
             onCommand(input, (String) null, wasMusicService);
@@ -447,21 +445,43 @@ public class MainManager {
     }*/
 //
 
-    public void performLaunch(AppsManager.LaunchInfo li) {
+    public boolean performLaunch(AppsManager.LaunchInfo li) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-            //List<LauncherActivityInfo> activityInfo = launcher.getActivityList(li.componentName.getPackageName(), li.profile);
+            li.launchedTimes++;
+            appsManager.preLaunch(li);
             try {
                 launcher.startMainActivity(li.componentName, li.profile, null, null);
+                if(showAppHistory) {
+                    if(appFormat == null) {
+                        appFormat = XMLPrefsManager.get(Behavior.app_launch_format);
+                        outputColor = XMLPrefsManager.getColor(Theme.output_color);
+                    }
+
+                    String a = new String(appFormat);
+                    a = pa.matcher(a).replaceAll(Matcher.quoteReplacement(li.componentName.getClassName()));
+                    a = pp.matcher(a).replaceAll(Matcher.quoteReplacement(li.componentName.getPackageName()));
+                    a = pl.matcher(a).replaceAll(Matcher.quoteReplacement(li.publicLabel));
+                    a = Tuils.patternNewline.matcher(a).replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE));
+
+                    SpannableString text = new SpannableString(a);
+                    text.setSpan(new ForegroundColorSpan(outputColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    CharSequence s = TimeManager.instance.replace(text);
+
+                    Tuils.sendOutput(mainPack, s, TerminalManager.CATEGORY_OUTPUT);
+                }
             } catch (SecurityException se) {
                 try {
                     launcher.startMainActivity(li.componentName, android.os.Process.myUserHandle(), null, null);
                 } catch (Exception e1) {
-                    //mContext.showToast(mContext.getString(R.string.unable_to_open_app));
+                    Tuils.sendOutput(mainPack.context, R.string.unable_to_open_app);
                 }
             } catch (Exception e2) {
-                //mContext.showToast(mContext.getString(R.string.tuinotfound_app));
+                Tuils.sendOutput(mainPack.context, R.string.unable_to_open_app);
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -473,6 +493,7 @@ public class MainManager {
 
         @Override
         public boolean trigger(MainPack info, String input) {
+
             String alias[] = aliasManager.getAlias(input, true);
 
             String aliasValue = alias[0];
@@ -570,7 +591,7 @@ public class MainManager {
         @Override
         public boolean trigger(MainPack info, String input) {
             AppsManager.LaunchInfo i = appsManager.findLaunchInfoWithLabel(input, AppsManager.SHOWN_APPS);
-            return i != null; // && performLaunch(i);
+            return i != null && performLaunch(i);
         }
     }
 

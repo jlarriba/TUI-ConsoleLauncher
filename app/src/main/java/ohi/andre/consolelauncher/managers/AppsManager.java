@@ -400,6 +400,16 @@ public class AppsManager implements XMLPrefsElement {
                         li = new LaunchInfo(app.getComponentName(), app.getLabel().toString());
                     }
 
+                    try {
+                        LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
+                        query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
+                        query.setPackage(li.componentName.getPackageName());
+                        li.setShortcuts(launcherApps.getShortcuts(query, profile));
+                    } catch (Throwable e) {
+                        // t-ui is not the default launcher
+                        Tuils.log(e);
+                    }
+
                     infos.add(li);
                 }
             }
@@ -524,6 +534,19 @@ public class AppsManager implements XMLPrefsElement {
                 .addCategory(Intent.CATEGORY_LAUNCHER)
                 .setComponent(info.componentName)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+    }
+
+    public void preLaunch(final LaunchInfo info) {
+        info.launchedTimes++;
+        new StoppableThread() {
+            @Override
+            public void run() {
+                super.run();
+
+                appsHolder.requestSuggestionUpdate(info);
+                writeLaunchTimes(info);
+            }
+        }.start();
     }
 
     public String hideActivity(LaunchInfo info) {
