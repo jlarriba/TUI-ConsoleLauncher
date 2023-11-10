@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -385,33 +386,32 @@ public class AppsManager implements XMLPrefsElement {
         Collections.sort(groups, (o1, o2) -> Tuils.alphabeticCompare(o1.name(), o2.name()));
     }
 
+    @TargetApi(Build.VERSION_CODES.N_MR1)
     private List<LaunchInfo> createAppMap(PackageManager mgr) {
         List<LaunchInfo> infos = new ArrayList<>();
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-            LaunchInfo li;
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+        LaunchInfo li;
 
-            for (UserHandle profile : userManager.getUserProfiles()) {
-                for (LauncherActivityInfo app : launcherApps.getActivityList(null, profile)) {
-                    if (!Process.myUserHandle().equals(profile)) {
-                        li = new LaunchInfo(app.getComponentName(), app.getLabel().toString() + " for work", profile);
-                    } else {
-                        li = new LaunchInfo(app.getComponentName(), app.getLabel().toString());
-                    }
-
-                    try {
-                        LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
-                        query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
-                        query.setPackage(li.componentName.getPackageName());
-                        li.setShortcuts(launcherApps.getShortcuts(query, profile));
-                    } catch (Throwable e) {
-                        // t-ui is not the default launcher
-                        Tuils.log(e);
-                    }
-
-                    infos.add(li);
+        for (UserHandle profile : userManager.getUserProfiles()) {
+            for (LauncherActivityInfo app : launcherApps.getActivityList(null, profile)) {
+                if (!Process.myUserHandle().equals(profile)) {
+                    li = new LaunchInfo(app.getComponentName(), app.getLabel().toString() + " for work", profile);
+                } else {
+                    li = new LaunchInfo(app.getComponentName(), app.getLabel().toString());
                 }
+
+                try {
+                    LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
+                    query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
+                    query.setPackage(li.componentName.getPackageName());
+                    li.setShortcuts(launcherApps.getShortcuts(query, profile));
+                } catch (Throwable e) {
+                    // t-ui is not the default launcher
+                    Tuils.log(e);
+                }
+
+                infos.add(li);
             }
         }
         return infos;
@@ -518,7 +518,7 @@ public class AppsManager implements XMLPrefsElement {
         if(appsHolder != null) appsHolder.update(true);
     }
 
-    public Intent getIntent(final LaunchInfo info) {
+    /*public Intent getIntent(final LaunchInfo info) {
         info.launchedTimes++;
         new StoppableThread() {
             @Override
@@ -534,7 +534,7 @@ public class AppsManager implements XMLPrefsElement {
                 .addCategory(Intent.CATEGORY_LAUNCHER)
                 .setComponent(info.componentName)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-    }
+    }*/
 
     public void preLaunch(final LaunchInfo info) {
         info.launchedTimes++;
@@ -1075,6 +1075,7 @@ public class AppsManager implements XMLPrefsElement {
             setLabel(label);
         }
 
+        @TargetApi(Build.VERSION_CODES.N_MR1)
         public LaunchInfo(ComponentName componentName, String label) {
             this.componentName = componentName;
             setLabel(label);

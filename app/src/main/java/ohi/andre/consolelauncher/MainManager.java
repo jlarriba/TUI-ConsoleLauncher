@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -445,44 +446,40 @@ public class MainManager {
     }*/
 //
 
+    @TargetApi(Build.VERSION_CODES.N_MR1)
     public boolean performLaunch(AppsManager.LaunchInfo li) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-            li.launchedTimes++;
-            appsManager.preLaunch(li);
+        LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+        appsManager.preLaunch(li);
+        try {
+            launcher.startMainActivity(li.componentName, li.profile, null, null);
+            if(showAppHistory) {
+                if(appFormat == null) {
+                    appFormat = XMLPrefsManager.get(Behavior.app_launch_format);
+                    outputColor = XMLPrefsManager.getColor(Theme.output_color);
+                }
+
+                String a = new String(appFormat);
+                a = pa.matcher(a).replaceAll(Matcher.quoteReplacement(li.componentName.getClassName()));
+                a = pp.matcher(a).replaceAll(Matcher.quoteReplacement(li.componentName.getPackageName()));
+                a = pl.matcher(a).replaceAll(Matcher.quoteReplacement(li.publicLabel));
+                a = Tuils.patternNewline.matcher(a).replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE));
+
+                SpannableString text = new SpannableString(a);
+                text.setSpan(new ForegroundColorSpan(outputColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                CharSequence s = TimeManager.instance.replace(text);
+
+                Tuils.sendOutput(mainPack, s, TerminalManager.CATEGORY_OUTPUT);
+            }
+        } catch (SecurityException se) {
             try {
-                launcher.startMainActivity(li.componentName, li.profile, null, null);
-                if(showAppHistory) {
-                    if(appFormat == null) {
-                        appFormat = XMLPrefsManager.get(Behavior.app_launch_format);
-                        outputColor = XMLPrefsManager.getColor(Theme.output_color);
-                    }
-
-                    String a = new String(appFormat);
-                    a = pa.matcher(a).replaceAll(Matcher.quoteReplacement(li.componentName.getClassName()));
-                    a = pp.matcher(a).replaceAll(Matcher.quoteReplacement(li.componentName.getPackageName()));
-                    a = pl.matcher(a).replaceAll(Matcher.quoteReplacement(li.publicLabel));
-                    a = Tuils.patternNewline.matcher(a).replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE));
-
-                    SpannableString text = new SpannableString(a);
-                    text.setSpan(new ForegroundColorSpan(outputColor), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    CharSequence s = TimeManager.instance.replace(text);
-
-                    Tuils.sendOutput(mainPack, s, TerminalManager.CATEGORY_OUTPUT);
-                }
-            } catch (SecurityException se) {
-                try {
-                    launcher.startMainActivity(li.componentName, android.os.Process.myUserHandle(), null, null);
-                } catch (Exception e1) {
-                    Tuils.sendOutput(mainPack.context, R.string.unable_to_open_app);
-                }
-            } catch (Exception e2) {
+                launcher.startMainActivity(li.componentName, android.os.Process.myUserHandle(), null, null);
+            } catch (Exception e1) {
                 Tuils.sendOutput(mainPack.context, R.string.unable_to_open_app);
             }
-            return true;
-        } else {
-            return false;
+        } catch (Exception e2) {
+            Tuils.sendOutput(mainPack.context, R.string.unable_to_open_app);
         }
+        return true;
     }
 
     public interface CmdTrigger {
