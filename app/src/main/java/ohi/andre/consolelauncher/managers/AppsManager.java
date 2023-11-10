@@ -1250,8 +1250,7 @@ public class AppsManager implements XMLPrefsElement {
 
                         LaunchInfo info = AppUtils.findLaunchInfoWithComponent(infos, name);
                         if(info == null) continue;
-                        // Stop adding an extra Play Store to the suggestions
-                        //suggested.add(new SuggestedApp(info, USER_DEFINIED, count + 1));
+                        suggested.add(new SuggestedApp(info, USER_DEFINIED, count + 1));
                     }
                 }
 
