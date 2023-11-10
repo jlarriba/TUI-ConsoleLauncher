@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "ohi.andre.consolelauncher"
 
-        minSdkVersion 14
+        minSdkVersion 25
         targetSdkVersion 27
         flavorDimensions "default"
 
@@ -19,7 +19,6 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            zipAlignEnabled true
         }
     }
     productFlavors {

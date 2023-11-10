@@ -385,7 +385,6 @@ public class AppsManager implements XMLPrefsElement {
         Collections.sort(groups, (o1, o2) -> Tuils.alphabeticCompare(o1.name(), o2.name()));
     }
 
-    @TargetApi(Build.VERSION_CODES.N_MR1)
     private List<LaunchInfo> createAppMap(PackageManager mgr) {
         List<LaunchInfo> infos = new ArrayList<>();
         UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
@@ -1074,7 +1073,6 @@ public class AppsManager implements XMLPrefsElement {
             setLabel(label);
         }
 
-        @TargetApi(Build.VERSION_CODES.N_MR1)
         public LaunchInfo(ComponentName componentName, String label) {
             this.componentName = componentName;
             setLabel(label);

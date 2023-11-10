@@ -442,7 +442,6 @@ public class MainManager {
     }*/
 //
 
-    @TargetApi(Build.VERSION_CODES.N_MR1)
     public boolean performLaunch(AppsManager.LaunchInfo li) {
         appsManager.preLaunch(li);
         LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);

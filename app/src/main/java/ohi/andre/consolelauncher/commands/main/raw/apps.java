@@ -170,15 +170,10 @@ public class apps extends ParamCommand {
 
             @Override
             public String exec(ExecutePack pack) {
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-                    AppsManager.LaunchInfo li = pack.getLaunchInfo();
-                    ((MainPack) pack).appsManager.preLaunch(li);
-                    LauncherApps launcher = (LauncherApps) pack.context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-                    launcher.startMainActivity(li.componentName, li.profile, null, null);
-                }
-                //Intent intent = ((MainPack) pack).appsManager.getIntent(pack.getLaunchInfo());
-                //pack.context.startActivity(intent);
-
+                AppsManager.LaunchInfo li = pack.getLaunchInfo();
+                ((MainPack) pack).appsManager.preLaunch(li);
+                LauncherApps launcher = (LauncherApps) pack.context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                launcher.startMainActivity(li.componentName, li.profile, null, null);
                 return null;
             }
         },
