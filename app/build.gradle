@@ -8,7 +8,7 @@ android {
         applicationId "ohi.andre.consolelauncher"
 
         minSdkVersion 25
-        targetSdkVersion 27
+        targetSdkVersion 33
         flavorDimensions "default"
 
         versionName "v7.0"
