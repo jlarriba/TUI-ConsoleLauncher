@@ -278,7 +278,7 @@ public class MainManager {
         }
     }
 
-    public void onCommand(String input, AppsManager.LaunchInfo launchInfo, UserHandle userHandle, boolean wasMusicService) {
+    public void onCommand(String input, AppsManager.LaunchInfo launchInfo, boolean wasMusicService) {
         if(launchInfo == null) {
             onCommand(input, (String) null, wasMusicService);
             return;
@@ -287,12 +287,9 @@ public class MainManager {
         updateServices(input, wasMusicService);
 
         if(launchInfo.unspacedLowercaseLabel.equals(Tuils.removeSpaces(input.toLowerCase()))) {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-                launchApp(launchInfo.componentName, );
-            } else {
-                performLaunch(mainPack, launchInfo, input);
-            }
-
+            Log.d("juan_oncommand", "performLaunch");
+            //performLaunch(mainPack, launchInfo, input);
+            performLaunch(launchInfo);
         } else {
             onCommand(input, (String) null, wasMusicService);
         }
@@ -300,7 +297,7 @@ public class MainManager {
 
     Pattern colorExtractor = Pattern.compile("(#[^(]{6})\\[([^\\)]*)\\]", Pattern.CASE_INSENSITIVE);
 
-//    command manager
+    //    command manager
     public void onCommand(String input, String alias, boolean wasMusicService) {
         input = Tuils.removeUnncesarySpaces(input);
 
@@ -317,7 +314,7 @@ public class MainManager {
         }
 
         if(alias != null && showAliasValue) {
-           Tuils.sendOutput(aliasContentColor, mContext, aliasManager.formatLabel(alias, input));
+            Tuils.sendOutput(aliasContentColor, mContext, aliasManager.formatLabel(alias, input));
         }
 
         String[] cmds;
@@ -411,7 +408,7 @@ public class MainManager {
         };
     }
 
-//
+    //
     String appFormat;
     int outputColor;
 
@@ -419,7 +416,7 @@ public class MainManager {
     Pattern pp = Pattern.compile("%p", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
     Pattern pl = Pattern.compile("%l", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
 
-    public boolean performLaunch(MainPack mainPack, AppsManager.LaunchInfo i, String input) {
+    /*public boolean performLaunch(MainPack mainPack, AppsManager.LaunchInfo i, String input) {
         Intent intent = appsManager.getIntent(i);
         if (intent == null) {
             return false;
@@ -447,24 +444,22 @@ public class MainManager {
         mainPack.context.startActivity(intent);
 
         return true;
-    }
+    }*/
 //
 
-    public void launchApp(ComponentName component, UserHandle userHandle) {
+    public void performLaunch(AppsManager.LaunchInfo li) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-            List<LauncherActivityInfo> activityInfo = launcher.getActivityList(component.getPackageName(), userHandle);
+            //List<LauncherActivityInfo> activityInfo = launcher.getActivityList(li.componentName.getPackageName(), li.profile);
             try {
-                launcher.startMainActivity(component, userHandle, null, null);
+                launcher.startMainActivity(li.componentName, li.profile, null, null);
             } catch (SecurityException se) {
                 try {
-                    launcher.startMainActivity(component, android.os.Process.myUserHandle(), null, null);
+                    launcher.startMainActivity(li.componentName, android.os.Process.myUserHandle(), null, null);
                 } catch (Exception e1) {
-                    Log.d("juan", "unable to open app");
                     //mContext.showToast(mContext.getString(R.string.unable_to_open_app));
                 }
             } catch (Exception e2) {
-                Log.d("juan", "unable to open app");
                 //mContext.showToast(mContext.getString(R.string.tuinotfound_app));
             }
         }
@@ -575,7 +570,7 @@ public class MainManager {
         @Override
         public boolean trigger(MainPack info, String input) {
             AppsManager.LaunchInfo i = appsManager.findLaunchInfoWithLabel(input, AppsManager.SHOWN_APPS);
-            return i != null && performLaunch(info, i, input);
+            return i != null; // && performLaunch(i);
         }
     }
 
