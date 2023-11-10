@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -397,7 +398,6 @@ public class SuggestionsManager {
     }
 
     public void requestSuggestion(final String input) {
-
         if(!enabled) return;
 
         if (suggestionViewParams == null) {
@@ -576,7 +576,6 @@ public class SuggestionsManager {
                         if(apps[count] == null) {
                             continue;
                         }
-
                         suggestionList.add(new Suggestion(beforeLastSpace , apps[count].publicLabel, clickToLaunch, Suggestion.TYPE_APP, apps[count]));
                     }
                 }

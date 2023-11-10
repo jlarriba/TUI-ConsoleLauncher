@@ -2,21 +2,17 @@ package ohi.andre.consolelauncher;
 
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Parcelable;
-import android.os.UserHandle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 
 import java.io.File;
 import java.util.List;
@@ -448,8 +444,8 @@ public class MainManager {
 
     @TargetApi(Build.VERSION_CODES.N_MR1)
     public boolean performLaunch(AppsManager.LaunchInfo li) {
-        LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
         appsManager.preLaunch(li);
+        LauncherApps launcher = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
         try {
             launcher.startMainActivity(li.componentName, li.profile, null, null);
             if(showAppHistory) {

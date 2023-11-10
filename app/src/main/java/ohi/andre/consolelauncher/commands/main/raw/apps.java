@@ -2,9 +2,11 @@ package ohi.andre.consolelauncher.commands.main.raw;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 
 import java.io.File;
 
@@ -168,8 +170,14 @@ public class apps extends ParamCommand {
 
             @Override
             public String exec(ExecutePack pack) {
-                Intent intent = ((MainPack) pack).appsManager.getIntent(pack.getLaunchInfo());
-                pack.context.startActivity(intent);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                    AppsManager.LaunchInfo li = pack.getLaunchInfo();
+                    ((MainPack) pack).appsManager.preLaunch(li);
+                    LauncherApps launcher = (LauncherApps) pack.context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                    launcher.startMainActivity(li.componentName, li.profile, null, null);
+                }
+                //Intent intent = ((MainPack) pack).appsManager.getIntent(pack.getLaunchInfo());
+                //pack.context.startActivity(intent);
 
                 return null;
             }

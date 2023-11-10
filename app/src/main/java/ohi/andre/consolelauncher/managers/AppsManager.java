@@ -1,5 +1,10 @@
 package ohi.andre.consolelauncher.managers;
 
+import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.VALUE_ATTRIBUTE;
+import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.resetFile;
+import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.set;
+import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.writeTo;
+
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -12,7 +17,6 @@ import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.content.pm.ShortcutInfo;
 import android.graphics.Color;
@@ -57,11 +61,6 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.tuils.StoppableThread;
 import ohi.andre.consolelauncher.tuils.Tuils;
-
-import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.VALUE_ATTRIBUTE;
-import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.resetFile;
-import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.set;
-import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.writeTo;
 
 public class AppsManager implements XMLPrefsElement {
 
@@ -1251,7 +1250,8 @@ public class AppsManager implements XMLPrefsElement {
 
                         LaunchInfo info = AppUtils.findLaunchInfoWithComponent(infos, name);
                         if(info == null) continue;
-                        suggested.add(new SuggestedApp(info, USER_DEFINIED, count + 1));
+                        // Stop adding an extra Play Store to the suggestions
+                        //suggested.add(new SuggestedApp(info, USER_DEFINIED, count + 1));
                     }
                 }
 
