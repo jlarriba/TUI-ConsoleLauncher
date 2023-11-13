@@ -1,5 +1,5 @@
 TASK null id=51
-  ACTIVITY ohi.andre.consolelauncher/.LauncherActivity 2d5004aa pid=3845
+  ACTIVITY tuixo/.LauncherActivity 2d5004aa pid=3845
     Local FragmentActivity 12e0e9bd State:
       mCreated=truemResumed=true mStopped=false mReallyStopped=false
       mLoadersStarted=true

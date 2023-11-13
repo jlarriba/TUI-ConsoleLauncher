@@ -5,7 +5,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "ohi.andre.consolelauncher"
+        applicationId "es.jlarriba.tuixo"
 
         minSdkVersion 25
         targetSdkVersion 33
@@ -38,7 +38,7 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
-    namespace 'ohi.andre.consolelauncher'
+    namespace 'es.jlarriba.tuixo'
     android.applicationVariants.all { variant ->
         def formattedDate = new Date().format('hh.mm')
 
