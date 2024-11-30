@@ -3,7 +3,6 @@ package es.jlarriba.tuixo.commands.main.raw;
 import android.content.Context;
 import android.os.Build;
 
-import es.jlarriba.tuixo.BuildConfig;
 import es.jlarriba.tuixo.R;
 import es.jlarriba.tuixo.commands.CommandAbstraction;
 import es.jlarriba.tuixo.commands.ExecutePack;
