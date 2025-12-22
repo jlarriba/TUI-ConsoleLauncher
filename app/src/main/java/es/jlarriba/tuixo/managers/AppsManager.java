@@ -5,11 +5,9 @@ import static es.jlarriba.tuixo.managers.xml.XMLPrefsManager.resetFile;
 import static es.jlarriba.tuixo.managers.xml.XMLPrefsManager.set;
 import static es.jlarriba.tuixo.managers.xml.XMLPrefsManager.writeTo;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.LauncherActivityInfo;
@@ -91,6 +89,9 @@ public class AppsManager implements XMLPrefsElement {
     private String appInstalledFormat, appUninstalledFormat;
     int appInstalledColor, appUninstalledColor;
 
+    private LauncherApps launcherApps;
+    private LauncherApps.Callback launcherAppsCallback;
+
     @Override
     public String[] delete() {
         return null;
@@ -111,19 +112,6 @@ public class AppsManager implements XMLPrefsElement {
         return prefsList;
     }
 
-    private BroadcastReceiver appsBroadcast = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            String data = intent.getData().getSchemeSpecificPart();
-            if (action.equals(Intent.ACTION_PACKAGE_ADDED)) {
-                appInstalled(data);
-            }
-            else {
-                appUninstalled(data);
-            }
-        }
-    };
 
     public AppsManager(final Context context) {
         instance = this;
@@ -167,12 +155,42 @@ public class AppsManager implements XMLPrefsElement {
     }
 
     private void initAppListener(Context c) {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        intentFilter.addDataScheme("package");
+        launcherApps = (LauncherApps) c.getSystemService(Context.LAUNCHER_APPS_SERVICE);
 
-        c.registerReceiver(appsBroadcast, intentFilter);
+        launcherAppsCallback = new LauncherApps.Callback() {
+            @Override
+            public void onPackageRemoved(String packageName, UserHandle user) {
+                appUninstalled(packageName, user);
+            }
+
+            @Override
+            public void onPackageAdded(String packageName, UserHandle user) {
+                appInstalled(packageName, user);
+            }
+
+            @Override
+            public void onPackageChanged(String packageName, UserHandle user) {
+                // Handle app updates by removing and re-adding
+                appUninstalled(packageName, user);
+                appInstalled(packageName, user);
+            }
+
+            @Override
+            public void onPackagesAvailable(String[] packageNames, UserHandle user, boolean replacing) {
+                for (String packageName : packageNames) {
+                    appInstalled(packageName, user);
+                }
+            }
+
+            @Override
+            public void onPackagesUnavailable(String[] packageNames, UserHandle user, boolean replacing) {
+                for (String packageName : packageNames) {
+                    appUninstalled(packageName, user);
+                }
+            }
+        };
+
+        launcherApps.registerCallback(launcherAppsCallback);
     }
 
     public void fill() {
@@ -392,7 +410,7 @@ public class AppsManager implements XMLPrefsElement {
         for (UserHandle profile : userManager.getUserProfiles()) {
             for (LauncherActivityInfo app : launcherApps.getActivityList(null, profile)) {
                 if (!Process.myUserHandle().equals(profile)) {
-                    li = new LaunchInfo(app.getComponentName(), app.getLabel().toString() + " for work", profile);
+                    li = new LaunchInfo(app.getComponentName(), app.getLabel().toString() + " 💼", profile);
                 } else {
                     li = new LaunchInfo(app.getComponentName(), app.getLabel().toString());
                 }
@@ -413,62 +431,71 @@ public class AppsManager implements XMLPrefsElement {
         return infos;
     }
 
-    private void appInstalled(String packageName) {
+    private void appInstalled(String packageName, UserHandle user) {
         try {
-            PackageManager manager = context.getPackageManager();
+            if (appsHolder == null || launcherApps == null) return;
 
-            PackageInfo packageInfo = manager.getPackageInfo(packageName, 0);
+            // Get all activities for this package and user
+            List<LauncherActivityInfo> activities = launcherApps.getActivityList(packageName, user);
+            if (activities == null || activities.isEmpty()) return;
 
-            if(appInstalledFormat != null) {
-                String cp = appInstalledFormat;
+            boolean isWorkProfile = !Process.myUserHandle().equals(user);
 
-                cp = pp.matcher(cp).replaceAll(packageName);
-                if(packageInfo != null) {
-                    CharSequence sequence = packageInfo.applicationInfo.loadLabel(manager);
-                    if(sequence != null) cp = pl.matcher(cp).replaceAll(sequence.toString());
-                } else {
-                    int index = packageName.lastIndexOf(Tuils.DOT);
-                    if(index == -1) cp = pl.matcher(cp).replaceAll(Tuils.EMPTYSTRING);
-                    else {
-                        cp = pl.matcher(cp).replaceAll(packageName.substring(index + 1));
-                    }
+            for (LauncherActivityInfo activityInfo : activities) {
+                String label = activityInfo.getLabel().toString();
+                if (isWorkProfile) {
+                    label = label + " 💼";
                 }
 
-                cp = Tuils.patternNewline.matcher(cp).replaceAll(Tuils.NEWLINE);
+                // Show install notification
+                if (appInstalledFormat != null) {
+                    String cp = appInstalledFormat;
+                    cp = pp.matcher(cp).replaceAll(packageName);
+                    cp = pl.matcher(cp).replaceAll(label);
+                    cp = Tuils.patternNewline.matcher(cp).replaceAll(Tuils.NEWLINE);
+                    Tuils.sendOutput(appInstalledColor, context, cp);
+                }
 
-                Tuils.sendOutput(appInstalledColor, context, cp);
+                LaunchInfo app;
+                if (isWorkProfile) {
+                    app = new LaunchInfo(activityInfo.getComponentName(), label, user);
+                } else {
+                    app = new LaunchInfo(activityInfo.getComponentName(), label);
+                }
+
+                // Try to get shortcuts for the app
+                try {
+                    LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
+                    query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
+                    query.setPackage(packageName);
+                    app.setShortcuts(launcherApps.getShortcuts(query, user));
+                } catch (Throwable e) {
+                    // Launcher may not be the default
+                }
+
+                appsHolder.add(app);
             }
 
-            Intent i = manager.getLaunchIntentForPackage(packageName);
-            if(i == null) return;
+            // Update UI
+            LocalBroadcastManager.getInstance(context.getApplicationContext())
+                    .sendBroadcast(new Intent(UIManager.ACTION_UPDATE_SUGGESTIONS));
 
-            ComponentName name = i.getComponent();
-            String activity = name.getClassName();
-            String label = manager.getActivityInfo(name, 0).loadLabel(manager).toString();
-
-            LaunchInfo app = new LaunchInfo(packageName, activity, label);
-            appsHolder.add(app);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            Tuils.log(e);
+        }
     }
 
-    private void appUninstalled(String packageName) {
+    private void appUninstalled(String packageName, UserHandle user) {
         if(appsHolder == null || context == null) return;
 
-        List<LaunchInfo> infos = AppUtils.findLaunchInfosWithPackage(packageName, appsHolder.getApps());
+        // Find apps matching both package name and user profile
+        List<LaunchInfo> infos = AppUtils.findLaunchInfosWithPackageAndUser(packageName, user, appsHolder.getApps());
 
-        if(appUninstalledFormat != null) {
+        if(appUninstalledFormat != null && infos.size() > 0) {
             String cp = appUninstalledFormat;
 
             cp = pp.matcher(cp).replaceAll(packageName);
-            if(infos.size() > 0) {
-                cp = pl.matcher(cp).replaceAll(infos.get(0).publicLabel);
-            } else {
-                int index = packageName.lastIndexOf(Tuils.DOT);
-                if(index == -1) cp = pl.matcher(cp).replaceAll(Tuils.EMPTYSTRING);
-                else {
-                    cp = pl.matcher(cp).replaceAll(packageName.substring(index + 1));
-                }
-            }
+            cp = pl.matcher(cp).replaceAll(infos.get(0).publicLabel);
             cp = Tuils.patternNewline.matcher(cp).replaceAll(Tuils.NEWLINE);
 
             Tuils.sendOutput(appUninstalledColor, context, cp);
@@ -476,9 +503,11 @@ public class AppsManager implements XMLPrefsElement {
 
         for(LaunchInfo i : infos) appsHolder.remove(i);
 
-//        for(Group g : groups) {
-//            removeAppFromGroup(g.getName(), packageName);
-//        }
+        // Update UI
+        if (infos.size() > 0) {
+            LocalBroadcastManager.getInstance(context.getApplicationContext())
+                    .sendBroadcast(new Intent(UIManager.ACTION_UPDATE_SUGGESTIONS));
+        }
     }
 
     public LaunchInfo findLaunchInfoWithLabel(String label, int type) {
@@ -886,12 +915,10 @@ public class AppsManager implements XMLPrefsElement {
         }
     }
 
-    public void unregisterReceiver(Context context) {
-        context.unregisterReceiver(appsBroadcast);
-    }
-
     public void onDestroy() {
-        unregisterReceiver(context);
+        if (launcherApps != null && launcherAppsCallback != null) {
+            launcherApps.unregisterCallback(launcherAppsCallback);
+        }
     }
 
     public static class Group implements MainManager.Group, StringableObject {
@@ -1466,6 +1493,17 @@ public class AppsManager implements XMLPrefsElement {
         private static List<LaunchInfo> findLaunchInfosWithPackage(String packageName, List<LaunchInfo> infos) {
             List<LaunchInfo> result = new ArrayList<>();
             for(LaunchInfo info : infos) if (info.componentName.getPackageName().equals(packageName)) result.add(info);
+            return result;
+        }
+
+        private static List<LaunchInfo> findLaunchInfosWithPackageAndUser(String packageName, UserHandle user, List<LaunchInfo> infos) {
+            List<LaunchInfo> result = new ArrayList<>();
+            for(LaunchInfo info : infos) {
+                if (info.componentName.getPackageName().equals(packageName) &&
+                    info.profile != null && info.profile.equals(user)) {
+                    result.add(info);
+                }
+            }
             return result;
         }
 

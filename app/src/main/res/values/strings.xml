@@ -62,6 +62,7 @@
     <!-- helps texts -->
     <string name="firsthelp_text">First time with t-ui?\n\ttutorial -> view the tutorial on GitHub\n\thelp     -> get a list of available commands</string>
     <string name="permissions_toast">You have to grant Storage permission</string>
+    <string name="manage_storage_permission_needed">Please enable \"All files access\" permission for t-ui to access config files</string>
     <string name="output_usedefapp">You can use \"apps -default_app\" instead</string>
 
     <!-- tui folder not found -->

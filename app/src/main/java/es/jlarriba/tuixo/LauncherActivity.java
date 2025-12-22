@@ -8,9 +8,12 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -193,16 +196,37 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Initialize Tuils with application context for storage access
+        Tuils.init(this);
+
         overridePendingTransition(0,0);
 
         if (isFinishing()) {
             return;
         }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED  &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, LauncherActivity.STARTING_PERMISSION);
+        // Handle storage permissions based on Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+ (API 30+): Check for MANAGE_EXTERNAL_STORAGE permission
+            if (!Environment.isExternalStorageManager()) {
+                // Prompt user to grant permission in Settings
+                Toast.makeText(this, R.string.manage_storage_permission_needed, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, STARTING_PERMISSION);
+            } else {
+                canApplyTheme = true;
+                finishOnCreate();
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android 6-10: Use legacy storage permissions
+            if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, LauncherActivity.STARTING_PERMISSION);
+            } else {
+                canApplyTheme = true;
+                finishOnCreate();
+            }
         } else {
             canApplyTheme = true;
             finishOnCreate();
@@ -514,6 +538,20 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
                 Tuils.sendOutput(this, R.string.tuixt_back_pressed);
             } else {
                 Tuils.sendOutput(this, data.getStringExtra(TuixtActivity.ERROR_KEY));
+            }
+        } else if (requestCode == STARTING_PERMISSION) {
+            // Returned from MANAGE_EXTERNAL_STORAGE settings
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    canApplyTheme = true;
+                    finishOnCreate();
+                } else {
+                    // Permission not granted, show toast and try again
+                    Toast.makeText(this, R.string.permissions_toast, Toast.LENGTH_LONG).show();
+                    // Restart the activity to prompt again
+                    finish();
+                    startActivity(getIntent());
+                }
             }
         }
     }

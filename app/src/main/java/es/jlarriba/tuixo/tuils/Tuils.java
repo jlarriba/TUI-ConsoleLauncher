@@ -1,5 +1,6 @@
 package es.jlarriba.tuixo.tuils;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
@@ -114,6 +115,13 @@ public class Tuils {
     public static final String EMPTYSTRING = "";
     private static final String TUI_FOLDER = "t-ui";
     public static final String MINUS = "-";
+
+    @SuppressLint("StaticFieldLeak")
+    private static Context appContext = null;
+
+    public static void init(Context context) {
+        appContext = context.getApplicationContext();
+    }
 
     public static Pattern patternNewline = Pattern.compile("%n", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
 
@@ -1380,8 +1388,27 @@ public class Tuils {
     }
 
     private static File getTuiFolder() {
-        File internalDir = Environment.getExternalStorageDirectory();
-        return new File(internalDir, TUI_FOLDER);
+        // On Android 11+ (API 30+), check if we have MANAGE_EXTERNAL_STORAGE permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                // We have full external storage access, use external storage
+                File externalDir = Environment.getExternalStorageDirectory();
+                return new File(externalDir, TUI_FOLDER);
+            } else if (appContext != null) {
+                // No external storage permission, use internal app storage
+                return new File(appContext.getFilesDir(), TUI_FOLDER);
+            }
+        }
+        // For older Android versions, use external storage
+        File externalDir = Environment.getExternalStorageDirectory();
+        return new File(externalDir, TUI_FOLDER);
+    }
+
+    public static boolean hasExternalStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        }
+        return true; // On older versions, permission is granted via manifest
     }
 
     public static double eval(final String str) {
