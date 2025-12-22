@@ -16,6 +16,7 @@
     <string name="tui_busy">t-ui is busy, use \"ctrlc\" to stop the process</string>
     <string name="donate">Do you like my work? You can offer me a coffee (cmd: $ donate). Thank you!</string>
     <string name="open_file_chooser">Open file with...</string>
+    <string name="unable_to_open_app">Unable to open app</string>
 
     <!-- weather -->
     <string name="weather_cant_update">You can\'t perform a manual update with the default key. You have to create a custom key on the website</string>
@@ -61,6 +62,7 @@
     <!-- helps texts -->
     <string name="firsthelp_text">First time with t-ui?\n\ttutorial -> view the tutorial on GitHub\n\thelp     -> get a list of available commands</string>
     <string name="permissions_toast">You have to grant Storage permission</string>
+    <string name="manage_storage_permission_needed">Please enable \"All files access\" permission for t-ui to access config files</string>
     <string name="output_usedefapp">You can use \"apps -default_app\" instead</string>
 
     <!-- tui folder not found -->

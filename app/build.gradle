@@ -1,26 +1,24 @@
 apply plugin: 'com.android.application'
 android {
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdk 33
     dexOptions {
     }
 
     defaultConfig {
-        applicationId "ohi.andre.consolelauncher"
+        applicationId "es.jlarriba.tuixo"
 
-        minSdkVersion 14
-        targetSdkVersion 27
+        minSdkVersion 25
+        targetSdkVersion 33
         flavorDimensions "default"
 
-        versionName "v6.15"
-        versionCode 205
+        versionName "v7.0"
+        versionCode 206
     }
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            zipAlignEnabled true
         }
     }
     productFlavors {
@@ -30,15 +28,20 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        buildConfig true
     }
     dependencies {
-        implementation 'com.android.support:appcompat-v7:27.1.1'
+        implementation 'androidx.appcompat:appcompat:1.6.1'
+        implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
     }
     lintOptions {
         checkReleaseBuilds false
     }
+    namespace 'es.jlarriba.tuixo'
     android.applicationVariants.all { variant ->
         def formattedDate = new Date().format('hh.mm')
 

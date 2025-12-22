@@ -1,14 +1,14 @@
--keep public class ohi.andre.consolelauncher.commands.main.raw.* { public *; }
--keep public abstract class ohi.andre.consolelauncher.commands.main.generals.* { public *; }
--keep public class ohi.andre.consolelauncher.commands.tuixt.raw.* { public *; }
--keep public class ohi.andre.consolelauncher.managers.notifications.NotificationService
--keep public class ohi.andre.consolelauncher.managers.notifications.KeeperService
--keep public class ohi.andre.consolelauncher.managers.options.**
--keep class ohi.andre.consolelauncher.tuils.libsuperuser.**
--keep class ohi.andre.consolelauncher.managers.suggestions.HideSuggestionViewValues
+-keep public class es.jlarriba.tuixo.commands.main.raw.* { public *; }
+-keep public abstract class es.jlarriba.tuixo.commands.main.generals.* { public *; }
+-keep public class es.jlarriba.tuixo.commands.tuixt.raw.* { public *; }
+-keep public class es.jlarriba.tuixo.managers.notifications.NotificationService
+-keep public class es.jlarriba.tuixo.managers.notifications.KeeperService
+-keep public class es.jlarriba.tuixo.managers.options.**
+-keep class es.jlarriba.tuixo.tuils.libsuperuser.**
+-keep class es.jlarriba.tuixo.managers.suggestions.HideSuggestionViewValues
 -keep public class it.andreuzzi.comparestring2.**
 
--dontwarn ohi.andre.consolelauncher.commands.main.raw.**
+-dontwarn es.jlarriba.tuixo.commands.main.raw.**
 
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**
