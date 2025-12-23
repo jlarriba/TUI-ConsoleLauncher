@@ -1,14 +1,14 @@
-# Privacy Policy for TUI-XO Console Launcher
+# Privacy Policy for TXT Launcher
 
 **Last updated: December 2025**
 
 ## Introduction
 
-TUI-XO Console Launcher is an open-source Android launcher application. This privacy policy explains how the app handles your data.
+TXT Launcher is an open-source Android launcher application. This privacy policy explains how the app handles your data.
 
 ## Data Collection
 
-**TUI-XO Console Launcher does not collect, store, or transmit any personal data to external servers.** All data remains on your device.
+**TXT Launcher does not collect, store, or transmit any personal data to external servers.** All data remains on your device.
 
 ## Permissions Used
 
@@ -58,11 +58,11 @@ All app configuration and data is stored locally on your device in the `/storage
 
 ## Third-Party Services
 
-TUI-XO Console Launcher does not integrate with any third-party analytics, advertising, or tracking services.
+TXT Launcher does not integrate with any third-party analytics, advertising, or tracking services.
 
 ## Open Source
 
-TUI-XO Console Launcher is open source. You can review the complete source code at:
+TXT Launcher is open source. You can review the complete source code at:
 https://github.com/jlarriba/TUI-ConsoleLauncher
 
 ## Children's Privacy
