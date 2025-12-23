@@ -78,8 +78,8 @@
         <!-- <item name="hint_telegram">Did you know? There\'s a Telegram group with many enthusiastic users, where you can discuss, share and chat (\"$ txt -telegram\")</item> -->
         <!-- <item name="hint_googlep">Did you know? Our official Google+ community is full of tips, experimental apks and discussions (\"$ txt -googlep\")</item> -->
         <item name="hint_tutorial">Did you read the tutorial? (\"$ tutorial\")</item>
-        <item name="hint_theme">Did you know that you can easily switch your theme? Have a look at the cmd \"$ theme\"</item>
-        <item name="hint_theme2">Did you know? You can create your custom theme and share it with other users. Have a look at the cmd \"$ theme -create\"</item>
+        <!-- <item name="hint_theme">Did you know that you can easily switch your theme? Have a look at the cmd \"$ theme\"</item> -->
+        <!-- <item name="hint_theme2">Did you know? You can create your custom theme and share it with other users. Have a look at the cmd \"$ theme -create\"</item> -->
         <item name="hint_help">Doubts about a command? Use \"$ help cmdName\"</item>
         <item name="hint_music">Did you know? You can listen to music using txt. Have a look at the cmd \"$ music\"</item>
         <item name="hint_appgroups">Did you know? txt 6.4 introduced App Groups.\nYou can get more details with the cmd \"$ apps -tutorial\"</item>
@@ -94,12 +94,13 @@
 
 
     <string-array name="tutorial">
+        <item>Did you read the tutorial? (\"$ tutorial\")</item>
         <item>Use the command \"help\" to get a list of available commands</item>
         <item>If you want to get info about the behavior of a command, type \"help cmdName\"</item>
         <item>Launch your apps typing their name</item>
         <item>You can call your contacts with the cmd \"call contactName\"</item>
         <item>txt is highly customizable. Check \"config -ls\" or use the cmd \"config -tutorial\" to see what you can change</item>
-        <item>You can choose within a large database of themes uploaded by txt users. Check the cmd \"theme -view\"</item>
+        <!-- <item>You can choose within a large database of themes uploaded by txt users. Check the cmd \"theme -view\"</item> -->
         <!-- <item>Join our community! Google+, Twitter, Telegram and GitHub. Use the cmd \"txt\"</item> -->
     </string-array>
 
@@ -347,10 +348,8 @@
         \n-reset -> removes the txt folder and resets default settings (restart required)
         \n-log [fileName] -> log the text on screen to the file
         \n-priority [command] [int] -> set the priority of the selected command
-        \n-twitter -> show txt Twitter page
-        \n-googlep -> show the community on Google+
-        \n-telegram -> open the official Telegram group
         \n-sourcecode -> open the GitHub page
+        \n-discord -> open the Discord server
         \n-folder -> print the path of the txt folder</string>
     <string name="help_tuinotes">-add [line] [text] -> add a new note at the specified line (the note will be appended if line is omitted)
         \n-rm [line] -> remove the note at the specified line

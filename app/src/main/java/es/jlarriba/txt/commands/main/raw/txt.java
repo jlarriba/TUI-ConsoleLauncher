@@ -98,31 +98,17 @@ public class txt extends ParamCommand {
                 return pack.context.getString(R.string.output_invalidarg);
             }
         },
-        telegram {
-            @Override
-            public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://t.me/tuilauncher"));
-                return null;
-            }
-        },
-        googlep {
-            @Override
-            public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://plus.google.com/communities/103936578623101446195"));
-                return null;
-            }
-        },
-        twitter {
-            @Override
-            public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://twitter.com/tui_launcher"));
-                return null;
-            }
-        },
         sourcecode {
             @Override
             public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://github.com/Andre1299/TUI-ConsoleLauncher"));
+                pack.context.startActivity(Tuils.webPage("https://github.com/jlarriba/TXT-Launcher"));
+                return null;
+            }
+        },
+        discord {
+            @Override
+            public String exec(ExecutePack pack) {
+                pack.context.startActivity(Tuils.webPage("https://discord.gg/Z4H4frxK97"));
                 return null;
             }
         },

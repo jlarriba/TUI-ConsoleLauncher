@@ -1,4 +1,4 @@
-# T-UI Linux CLI Launcher
+# TXT Launcher
 
 <a href="https://play.google.com/store/apps/details?id=tuixo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="60"></a>    <a href="https://f-droid.org/packages/tuixo">
     <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
@@ -6,31 +6,18 @@
     height="60">
 </a>
 
+## Contact
+Discord: https://discord.gg/Z4H4frxK97
 
-## Useful links
+## Rationale
+This is, basically, the old [TUI-ConsoleLauncher](https://github.com/fandreuz/TUI-ConsoleLauncher) project by Francesco Andreuzzi. I have been using it for ages, but the project seemed to be discontinued and the app removed from the Play and F-Droid stores. As it was impossible for me to get installations of the app for my new phones, I got the source code and have been building my own copies of TUI since a while now. Also, for it to work on newer android versions I had to keep updating the API and introducing the new permissions schemes as they have been deprecated.
 
-**@tui_launcher**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[Twitter.com](https://twitter.com/tui_launcher)**<br>
-**Official community**&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[Reddit](https://www.reddit.com/r/tui_launcher/)**<br>
-**Official Group**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[Telegram](https://t.me/tuilauncher)**<br>
-**Wiki**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[GitHub.com](https://github.com/Andre1299/TUI-ConsoleLauncher/wiki)**<br>
-**FAQ**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[GitHub.com](https://github.com/Andre1299/TUI-ConsoleLauncher/wiki/FAQ)**
+Also, when TUI was created, profiles did not existed yet on android, so they were never implemented. So I implemented support for work profile. Now, the apps for the work profile appear with a small briefcase in their name to distinguish from the main profile apps.
 
-## Some mentions
+I have thought that maybe there are still some people wanting to continue to use a supported version of TUI, so I created this.
 
-- **[XDA](https://www.xda-developers.com/linux-cli-launcher-transforms-your-home-screen-into-a-terminal/)**
-- **[Android Authority](http://www.androidauthority.com/linux-cli-launcher-turns-homepage-linux-command-line-interface-767431/)**
-- **[Gadget Hacks](https://android.gadgethacks.com/how-to/linux-style-launcher-turns-your-home-screen-into-command-prompt-0177326/)**
-
-## Contributing
-**Pull requests** are welcome. But **before** you decide to make a major change you should contact me (**[e-mail](mailto:andreuzzi.francesco@gmail.com)**) in order to check if I'm going to include your change in t-ui, so you don't waste your time.
-
-## How to format a bug report
-1. Set "**Bug report**" as subject
-2. Describe the issue, when it happens, how to reproduce it
-3. **English**! (or Italian, at least)
-4. Include any **screenshot** that you think could help (*outputs*, *UI*, etc..)
-5. Include any **file** that you think could help (*behavior.xml*, *ui.xml*, etc..)
-6. Send it to **andreuzzi.francesco@gmail.com**
+## Bugs
+Report any bugs you find either here in Github or in Discord.
 
 ## Open source libraries
 * [**CompareString2**](https://github.com/fAndreuzzi/CompareString2)
@@ -38,3 +25,14 @@
 * [**HTML cleaner**](http://htmlcleaner.sourceforge.net/)
 * [**JsonPath**](https://github.com/json-path/JsonPath)
 * [**jsoup**](https://github.com/jhy/jsoup/)
+
+## Disclaimer
+This is a derivative work of love, and I have tried my best to abide to the original t-ui license.
+
+First of all, the app is and will always be free, as in free beer and as in freedom. There is no user data gathering whatsoever, and everything stays in your own device. The license said that I need to provide a link to the original source code repository, which I do in this very README. The "txt -sourcecode" option inside the app redirects to the forked repo, as it seems more reasonable for people wanting to contribute. It also said to provide a link to the original Play Store page, but that is not possible as the application was pulled off and the page Store deleted.
+
+The author appears both here and in the "txt -about" inside the app. The t-ui name was removed from everywhere and replaced with "txt", as stated in the original license.
+
+And last but not least, I have changed the license to the GPL 3.0.
+
+If I have done something wrong, please state that in the project's Discord.
