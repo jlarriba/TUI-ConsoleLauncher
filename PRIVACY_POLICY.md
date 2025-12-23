@@ -31,7 +31,7 @@ The app requests certain permissions to provide its functionality. Here's what e
 - No photos or videos are captured
 
 ### Storage (READ/WRITE_EXTERNAL_STORAGE, MANAGE_EXTERNAL_STORAGE)
-- Used to store and read configuration files in the t-ui folder
+- Used to store and read configuration files in the txt folder
 - Used to access files when you use file-related commands
 - No files are uploaded or shared externally
 
@@ -51,7 +51,7 @@ The app requests certain permissions to provide its functionality. Here's what e
 
 ## Data Storage
 
-All app configuration and data is stored locally on your device in the `/storage/emulated/0/t-ui/` folder. This data includes:
+All app configuration and data is stored locally on your device in the `/storage/emulated/0/txt/` folder. This data includes:
 - Theme preferences
 - Command aliases
 - App settings

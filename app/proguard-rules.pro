@@ -1,14 +1,14 @@
--keep public class es.jlarriba.tuixo.commands.main.raw.* { public *; }
--keep public abstract class es.jlarriba.tuixo.commands.main.generals.* { public *; }
--keep public class es.jlarriba.tuixo.commands.tuixt.raw.* { public *; }
--keep public class es.jlarriba.tuixo.managers.notifications.NotificationService
--keep public class es.jlarriba.tuixo.managers.notifications.KeeperService
--keep public class es.jlarriba.tuixo.managers.options.**
--keep class es.jlarriba.tuixo.tuils.libsuperuser.**
--keep class es.jlarriba.tuixo.managers.suggestions.HideSuggestionViewValues
+-keep public class es.jlarriba.txt.commands.main.raw.* { public *; }
+-keep public abstract class es.jlarriba.txt.commands.main.generals.* { public *; }
+-keep public class es.jlarriba.txt.commands.txtxt.raw.* { public *; }
+-keep public class es.jlarriba.txt.managers.notifications.NotificationService
+-keep public class es.jlarriba.txt.managers.notifications.KeeperService
+-keep public class es.jlarriba.txt.managers.options.**
+-keep class es.jlarriba.txt.tuils.libsuperuser.**
+-keep class es.jlarriba.txt.managers.suggestions.HideSuggestionViewValues
 -keep public class it.andreuzzi.comparestring2.**
 
--dontwarn es.jlarriba.tuixo.commands.main.raw.**
+-dontwarn es.jlarriba.txt.commands.main.raw.**
 
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**

@@ -135,9 +135,9 @@
             android:exported="true" />
 
         <activity
-            android:name=".commands.tuixt.TuixtActivity"
+            android:name=".commands.txtxt.TxtxtActivity"
             android:excludeFromRecents="true"
-            android:label="@string/tuixt_label"
+            android:label="@string/txtxt_label"
             android:noHistory="true"
             android:theme="@style/Custom.Solid"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
